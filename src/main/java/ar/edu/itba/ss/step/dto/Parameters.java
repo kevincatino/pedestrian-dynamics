@@ -1,17 +1,20 @@
 package ar.edu.itba.ss.step.dto;
 
 import ar.edu.itba.ss.step.utils.IO;
-import ar.edu.itba.ss.step.utils.PostProcessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 
 public class Parameters {
@@ -47,11 +50,6 @@ public class Parameters {
     private final Map<String, Consumer<Parameters>> runners = new HashMap<>();
 
 
-    public void setVelocityOutputFile(String velocityOutputFile) {
-        this.velocityOutputFile = velocityOutputFile;
-    }
-
-    private String velocityOutputFile;
 
     public boolean isOrder() {
         return order;
@@ -66,19 +64,48 @@ public class Parameters {
 
     public Parameters() {
 
-        runners.put("phi",Parameters::phi);
+        runners.put("parseRawFiles",Parameters::parseRawFiles);
 
     }
 
     public void run() {
         runners.get(runner).accept(this);
     }
+    private static void parseRawFilesHelper(String file, Map<Double, Set<PedestrianDto>> pedestrians, int initialId) {
+         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
 
+            while ((line = br.readLine()) != null) {
+                String[] values = line.trim().split("\\s+");  // Split by whitespace
+                double time = Double.parseDouble(values[0])*(4.0/30);
+                pedestrians.putIfAbsent(time, new TreeSet<>());
+                pedestrians.get(time).add(new PedestrianDto(Double.parseDouble(values[2]),
+                        Double.parseDouble(values[1]), initialId + (int)Double.parseDouble(values[3])));
+            }
 
-      private static void phi(Parameters params) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+      private static void parseRawFiles(Parameters params) {
+        Map<Double, Set<PedestrianDto>> pedestrians = new TreeMap<>();
+        String filePath = "Trayectorias_0_To_13_frames_1_1000_m.txt";
+          String filePath2 = "Trayectorias_14_To_25_frames_1_1000_m.txt";
+        parseRawFilesHelper(filePath, pedestrians, 0);
+        parseRawFilesHelper(filePath2, pedestrians, 13);
+
           ObjectMapper objectMapper = new ObjectMapper();
+          List<TimeInstantDto> timeInstantDtoList = new ArrayList<>();
+          int count =-1;
+          for (Map.Entry<Double, Set<PedestrianDto>> entry : pedestrians.entrySet()) {
+              if (count == -1)
+                  count = entry.getValue().size();
+              if (entry.getValue().size() == count)
+                timeInstantDtoList.add(new TimeInstantDto(entry.getKey(),entry.getValue()));
+          }
           try {
-
+            objectMapper.writeValue(new File("pedestrians.json"), timeInstantDtoList);
               // Write file
           } catch (Exception e) {
               throw new RuntimeException(e);
