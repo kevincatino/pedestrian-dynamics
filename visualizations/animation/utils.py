@@ -32,3 +32,17 @@ def print_occurrences(frames: list[Frame]):
 
     for id, count in counts.items():
         print(f"ID {id}: {count} occurrences")
+
+
+def get_ids_count(frames: list[Frame]):
+    if frames is None:
+        raise Exception("Empty frames")
+
+    mapped_ids = map(lambda frame: [pedestrian.get_id() for pedestrian in frame.pedestrians], frames)
+
+    all_ids = [id for sublist in mapped_ids for id in sublist]
+    unique_ids = set(all_ids)
+
+    return len(unique_ids)
+
+
