@@ -11,7 +11,7 @@ frames_folder = "frames"
 output_video_filename = "animation.mp4"
 
 frames = parse_pedestrian_json()
-total_ids = get_ids_count(frames) - 1
+total_ids = get_ids_count(frames)
 
 fig, ax = plt.subplots()
 
@@ -37,7 +37,12 @@ for frame in frames:
         state_by_id[id]['x'].append(x)
         state_by_id[id]['y'].append(y)
 
+        # Last 5 frames
+        state_by_id[id]['x'] = state_by_id[id]['x'][-5:]
+        state_by_id[id]['y'] = state_by_id[id]['y'][-5:]
+
         plt.plot(state_by_id[id]['x'], state_by_id[id]['y'], color=f'C{id % total_ids}', alpha=0.5)
+        plt.plot(x, y, 'ro', markersize=5)
 
     plt.xlabel('Coordenada X')
     plt.ylabel('Coordenada Y')
