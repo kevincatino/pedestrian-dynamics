@@ -26,6 +26,14 @@ public class TimeInstantDto {
     private double time;
     private Collection<PedestrianDto> pedestrians;
 
+    public PedestrianDto getPedestrian(int id) {
+        for (PedestrianDto p : pedestrians) {
+            if (p.getId() == id)
+                return p;
+        }
+        return null;
+    }
+
     public TimeInstantDto(double time, Collection<PedestrianDto> pedestrians) {
         this.time = time;
         this.pedestrians = pedestrians;

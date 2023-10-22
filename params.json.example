@@ -1,0 +1,8 @@
+{
+  "runner": "experimentVelocity" | "parseRawFiles"
+  "startTime": 2,
+  "endTime": 6,
+  "id": 0,
+  "experimentOutput": "pedestrians.json",
+  "experimentVelocityOutput": "expVelocity.json"
+}
