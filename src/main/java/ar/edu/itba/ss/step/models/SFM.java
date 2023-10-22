@@ -46,8 +46,10 @@ public class SFM implements Simulation {
 
         @Override
         public Pair<Double,Pedestrian> next() {
+            Pair<Double,Pedestrian> toReturn = Pair.of(time,new Pedestrian(pedestrian.getVd(), pedestrian.getV(), pedestrian.getMass()));
+
             advance(delta);
-            return Pair.of(time,pedestrian);
+            return toReturn;
         }
     }
 }

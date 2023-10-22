@@ -12,12 +12,7 @@ public class Pedestrian {
         return mass;
     }
 
-    public double getTau() {
-        return tau;
-    }
-
     private final double mass;
-    private final double tau;
 
     private double x;
 
@@ -41,11 +36,10 @@ public class Pedestrian {
 
 
 
-    public Pedestrian(double vd, double v, double mass, double tau) {
+    public Pedestrian(double vd, double v, double mass) {
         this.vd = vd;
         this.v = v;
         this.mass = mass;
-        this.tau = tau;
     }
 
 

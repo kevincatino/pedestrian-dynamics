@@ -1,8 +1,12 @@
 {
-  "runner": "experimentVelocity" | "parseRawFiles"
+  "runner": "experimentVelocity" | "parseRawFiles" | "velocityComp"
   "startTime": 2,
   "endTime": 6,
   "id": 0,
   "experimentOutput": "pedestrians.json",
-  "experimentVelocityOutput": "expVelocity.json"
+  "experimentVelocityOutput": "expVelocity.json",
+  "experimentVelocityCompOutput": "compVelocity.json",
+  "tau": 0.5,
+  "initialVelocity": 0,
+  "targetVelocity": 1.1
 }
