@@ -246,6 +246,7 @@ public class Parameters {
 
                   double v = Math.sqrt(Math.pow(i.getValue().getX() - prev.getValue().getX(),2) + Math.pow(i.getValue().getY() - prev.getValue().getY(),2)) / (i.getKey() - prev.getKey());
                   velocities.add(new VelocityDto(i.getKey(), v));
+                  prev = i;
               }
           } catch(RuntimeException | IOException e) {
               throw new RuntimeException(e);
