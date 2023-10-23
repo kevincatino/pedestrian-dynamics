@@ -29,10 +29,10 @@ class Frame:
         return self.pedestrians
 
     def get_time(self):
-        return self.time
+        return round(self.time, 1)
 
     def __str__(self):
-        return f"\nFrame = Time: {round(self.time, 2)}, Total: {len(self.pedestrians)}, Pedestrians: {[pedestrian for pedestrian in self.pedestrians]}\n"
+        return f"\nFrame = Time: {round(self.time, 1)}, Total: {len(self.pedestrians)}, Pedestrians: {[pedestrian for pedestrian in self.pedestrians]}\n"
 
     def __repr__(self):
         return self.__str__()
