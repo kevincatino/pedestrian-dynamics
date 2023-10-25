@@ -193,6 +193,11 @@ public class Parameters {
         this.experimentVelocityCompOutput = experimentVelocityCompOutput;
     }
 
+    private static String appendValue(String fileName, Object value) {
+        String[] splitted = fileName.split("\\.");
+        return splitted[0] + value + "." + splitted[1];
+    }
+
     private String experimentVelocityCompOutput;
     private static void velocityComp(Parameters params) {
 
@@ -222,7 +227,7 @@ public class Parameters {
           try {
             VelocityContainerDto c = new VelocityContainerDto(params.getId(), MathHelper.calculateMSE(velocities, v -> Pair.of(v.getvSim(),v.getvExp())),velocities);
 
-            objectMapper.writeValue(new File(params.getExperimentVelocityCompOutput()),c);
+            objectMapper.writeValue(new File(appendValue(params.getExperimentVelocityCompOutput(), params.getId())),c);
               // Write file
           } catch (Exception e) {
               throw new RuntimeException(e);
@@ -267,7 +272,7 @@ public class Parameters {
 
 
               VelocityContainerDto c = new VelocityContainerDto(params.getId(), 0,velocities);
-            objectMapper.writeValue(new File(params.getExperimentVelocityOutput()), c);
+            objectMapper.writeValue(new File(appendValue(params.getExperimentVelocityOutput(), params.getId())), c);
 
               // Write file
           } catch (Exception e) {
