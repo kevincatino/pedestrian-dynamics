@@ -4,13 +4,24 @@ import java.util.List;
 
 public class VelocityContainerDto {
     private int id;
+
+    public double getDa() {
+        return da;
+    }
+
+    public void setDa(double da) {
+        this.da = da;
+    }
+
+    private double da;
 public VelocityContainerDto() {
 
 }
-    public VelocityContainerDto(int id, double error, List<VelocityDto> velocities) {
+    public VelocityContainerDto(int id, double error, List<VelocityDto> velocities, double da) {
         this.id = id;
         this.error = error;
         this.velocities = velocities;
+        this.da = da;
     }
 
     public double getError() {

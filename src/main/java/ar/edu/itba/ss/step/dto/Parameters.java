@@ -3,8 +3,11 @@ package ar.edu.itba.ss.step.dto;
 import ar.edu.itba.ss.step.models.Pair;
 import ar.edu.itba.ss.step.models.Pedestrian;
 import ar.edu.itba.ss.step.models.SFMStepProcessor;
+import ar.edu.itba.ss.step.models.SimpleTargetProvider;
 import ar.edu.itba.ss.step.models.SimulationEngine;
 import ar.edu.itba.ss.step.models.StepProcessor;
+import ar.edu.itba.ss.step.models.TargetHelper;
+import ar.edu.itba.ss.step.models.TargetProvider;
 import ar.edu.itba.ss.step.models.Vector;
 import ar.edu.itba.ss.step.utils.IO;
 import ar.edu.itba.ss.step.utils.MathHelper;
@@ -115,39 +118,92 @@ public class Parameters {
     public void run() {
         runners.get(runner).accept(this);
     }
-    private static void parseRawFilesHelper(String file, Map<Double, Set<PedestrianDto>> pedestrians, int initialId) {
+    private static void parseRawFilesHelper(String file, Map<Double, Map<Integer,PedestrianDto>> pedestrians, int initialId) {
          try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
 
             while ((line = br.readLine()) != null) {
                 String[] values = line.trim().split("\\s+");  // Split by whitespace
                 double time = (Double.parseDouble(values[0])-1)*(4.0/30);
-                pedestrians.putIfAbsent(time, new TreeSet<>());
-                pedestrians.get(time).add(new PedestrianDto(Double.parseDouble(values[2]),
+                pedestrians.putIfAbsent(time, new TreeMap<>());
+
+                pedestrians.get(time).put(initialId + (int)Double.parseDouble(values[3]),new PedestrianDto(Double.parseDouble(values[2]),
                         -Double.parseDouble(values[1]), initialId + (int)Double.parseDouble(values[3])));
             }
+            for (Integer id : pedestrians.get(0.0).keySet()) {
+                double prevTime = -1;
+                double prevX = -1;
+                double prevY = -1;
+                 for (Map.Entry<Double,Map<Integer,PedestrianDto>> entry : pedestrians.entrySet()) {
+                     PedestrianDto p = entry.getValue().get(id);
+                      if (p == null) {
+                         continue;
+                     }
+                     Vector target = getTarget(p,entry.getKey());
+                      p.setTargetX(target.getX());
+                      p.setTargetY(target.getY());
+                 if (prevTime < 0) {
+                     p.setVx(0);
+                     p.setVy(0);
+                     prevTime = 0;
+                     prevX = p.getX();
+                     prevY = p.getY();
+                 } else {
+                     double time = entry.getKey();
+
+                     p.setVx((p.getX() - prevX)/(time - prevTime));
+                     p.setVy((p.getY() - prevY)/(time - prevTime));
+                     prevX = p.getX();
+                     prevY = p.getY();
+                     prevTime = time;
+                 }
+             }
+            }
+
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-      private static void parseRawFiles(Parameters params) {
-        Map<Double, Set<PedestrianDto>> pedestrians = new TreeMap<>();
+    private static List<TimeInstantDto> getPedestrians(Parameters params) {
+         Map<Double, Map<Integer,PedestrianDto>> pedestrians = new TreeMap<>();
         String filePath = "Trayectorias_0_To_13_frames_1_1000_m.txt";
           String filePath2 = "Trayectorias_14_To_25_frames_1_1000_m.txt";
         parseRawFilesHelper(filePath, pedestrians, 0);
         parseRawFilesHelper(filePath2, pedestrians, 14);
 
-          ObjectMapper objectMapper = new ObjectMapper();
           List<TimeInstantDto> timeInstantDtoList = new ArrayList<>();
           int count =-1;
-          for (Map.Entry<Double, Set<PedestrianDto>> entry : pedestrians.entrySet()) {
+          for (Map.Entry<Double, Map<Integer,PedestrianDto>> entry : pedestrians.entrySet()) {
               if (count == -1)
                   count = entry.getValue().size();
               if (entry.getValue().size() == count)
-                timeInstantDtoList.add(new TimeInstantDto(entry.getKey(),entry.getValue()));
+                timeInstantDtoList.add(new TimeInstantDto(entry.getKey(),entry.getValue().values()));
           }
+          return timeInstantDtoList;
+    }
+
+    private static Vector getTarget(PedestrianDto dto, double time) {
+        Map<Integer,Vector> targets = Map.of(
+                1, Vector.of(0,0)
+        );
+        Map<Integer, TargetHelper> helpers = Map.of(
+                0, new TargetHelper(Pair.of(5.0,Vector.of(0,0)))
+        );
+
+        return Vector.of(0,0);
+
+//        return helpers.get(dto.getId()).getTarget(time);
+
+    }
+
+
+      private static void parseRawFiles(Parameters params) {
+
+          ObjectMapper objectMapper = new ObjectMapper();
+          List<TimeInstantDto> timeInstantDtoList =getPedestrians(params);
+
           try {
             objectMapper.writeValue(new File("pedestrians.json"), timeInstantDtoList);
               // Write file
@@ -203,12 +259,16 @@ public class Parameters {
 
     private static VelocityContainerDto getVelocityComp(Parameters params) {
           List<VelocityDto> velocities = getExperimentVelocity(params);
-          Pedestrian p = new Pedestrian(Vector.of(1800,0), params.getTargetVelocity(), 80);
+          Pedestrian p = new Pedestrian(new SimpleTargetProvider(Vector.of(1800,0)), params.getTargetVelocity(), 80);
         SimulationEngine sim = new SimulationEngine();
-        StepProcessor sfmStepProcessor = new SFMStepProcessor(params.getTau(),0.1);
+        double da = -1;
+        StepProcessor sfmStepProcessor = new SFMStepProcessor(params.getTau());
         double initialTime = -1;
-        Iterator<Pair<Double, Pedestrian>> it = sim.simulate(p,sfmStepProcessor);
+        Iterator<Pair<Double, Pedestrian>> it = sim.simulate(p,sfmStepProcessor, 0.1, params.getEndTime());
         for (VelocityDto dto : velocities) {
+            if (da < 0) {
+                da = dto.getDa();
+            }
             if (initialTime == -1) {
                 initialTime = dto.getTime();
             }
@@ -224,7 +284,7 @@ public class Parameters {
         }
 
 
-        VelocityContainerDto c = new VelocityContainerDto(params.getId(), MathHelper.calculateMSE(velocities, v -> Pair.of(v.getvSim(),v.getvExp())),velocities);
+        VelocityContainerDto c = new VelocityContainerDto(params.getId(), MathHelper.calculateMSE(velocities, v -> Pair.of(v.getvSim(),v.getvExp())),velocities,da);
         return c;
 
 
@@ -272,31 +332,11 @@ public class Parameters {
 
        private static void velocityComp(Parameters params) {
 
-
            ObjectMapper objectMapper = new ObjectMapper();
-          List<VelocityDto> velocities = getExperimentVelocity(params);
-          Pedestrian p = new Pedestrian(Vector.of(1800,0), params.getTargetVelocity(), 80);
-        SimulationEngine sim = new SimulationEngine();
-        StepProcessor sfmStepProcessor = new SFMStepProcessor(params.getTau(),0.1);
-        double initialTime = -1;
-        Iterator<Pair<Double, Pedestrian>> it = sim.simulate(p,sfmStepProcessor);
-        for (VelocityDto dto : velocities) {
-            if (initialTime == -1) {
-                initialTime = dto.getTime();
-            }
-            double v = 0;
-            while(it.hasNext()) {
-                Pair<Double, Pedestrian> next = it.next();
-                if (next.getOne() + initialTime >= dto.getTime()) {
-                    v = next.getOther().getVelocity().getMod();
-                    break;
-                }
-            }
-            dto.setvSim(v);
-        }
+
+           VelocityContainerDto c =getVelocityComp(params);
 
           try {
-            VelocityContainerDto c = new VelocityContainerDto(params.getId(), MathHelper.calculateMSE(velocities, v -> Pair.of(v.getvSim(),v.getvExp())),velocities);
 
             objectMapper.writeValue(new File(appendValue(params.getExperimentVelocityCompOutput(), params.getId())),c);
               // Write file
@@ -330,9 +370,10 @@ public class Parameters {
                       prev = i;
                       continue;
                   }
+                  PedestrianDto p = i.getValue();
 
                   double v = Math.sqrt(Math.pow(i.getValue().getX() - prev.getValue().getX(),2) + Math.pow(i.getValue().getY() - prev.getValue().getY(),2)) / (i.getKey() - prev.getKey());
-                  velocities.add(new VelocityDto(i.getKey(), v));
+                  velocities.add(new VelocityDto(i.getKey(), v, Vector.of(p.getTargetX(), p.getTargetY()).substract(Vector.of(p.getX(), p.getY())).getMod()));
                   prev = i;
               }
           } catch(RuntimeException | IOException e) {
@@ -352,7 +393,7 @@ public class Parameters {
           try {
 
 
-              VelocityContainerDto c = new VelocityContainerDto(params.getId(), 0,velocities);
+              VelocityContainerDto c = new VelocityContainerDto(params.getId(), 0,velocities, velocities.get(0).getDa());
             objectMapper.writeValue(new File(appendValue(params.getExperimentVelocityOutput(), params.getId())), c);
 
               // Write file
