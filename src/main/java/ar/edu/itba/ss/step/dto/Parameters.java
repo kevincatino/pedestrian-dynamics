@@ -136,7 +136,7 @@ public class Parameters {
         String filePath = "Trayectorias_0_To_13_frames_1_1000_m.txt";
           String filePath2 = "Trayectorias_14_To_25_frames_1_1000_m.txt";
         parseRawFilesHelper(filePath, pedestrians, 0);
-        parseRawFilesHelper(filePath2, pedestrians, 13);
+        parseRawFilesHelper(filePath2, pedestrians, 14);
 
           ObjectMapper objectMapper = new ObjectMapper();
           List<TimeInstantDto> timeInstantDtoList = new ArrayList<>();
