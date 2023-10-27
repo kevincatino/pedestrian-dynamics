@@ -9,7 +9,7 @@ framerate = 20
 save_video = True
 frames_folder = "frames"
 output_video_filename = "animation.mp4"
-show_frame_time = True
+show_frame_time = False
 
 frames = parse_pedestrian_json()
 total_ids = get_ids_count(frames)
