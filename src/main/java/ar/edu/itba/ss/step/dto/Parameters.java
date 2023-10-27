@@ -108,6 +108,7 @@ public class Parameters {
         runners.put("parseRawFiles",Parameters::parseRawFiles);
         runners.put("experimentVelocity",Parameters::experimentVelocity);
         runners.put("velocityComp",Parameters::velocityComp);
+        runners.put("tauErrors",Parameters::tauErrors);
 
     }
 
@@ -199,7 +200,77 @@ public class Parameters {
     }
 
     private String experimentVelocityCompOutput;
-    private static void velocityComp(Parameters params) {
+
+    private static VelocityContainerDto getVelocityComp(Parameters params) {
+          List<VelocityDto> velocities = getExperimentVelocity(params);
+          Pedestrian p = new Pedestrian(Vector.of(1800,0), params.getTargetVelocity(), 80);
+        SimulationEngine sim = new SimulationEngine();
+        StepProcessor sfmStepProcessor = new SFMStepProcessor(params.getTau(),0.1);
+        double initialTime = -1;
+        Iterator<Pair<Double, Pedestrian>> it = sim.simulate(p,sfmStepProcessor);
+        for (VelocityDto dto : velocities) {
+            if (initialTime == -1) {
+                initialTime = dto.getTime();
+            }
+            double v = 0;
+            while(it.hasNext()) {
+                Pair<Double, Pedestrian> next = it.next();
+                if (next.getOne() + initialTime >= dto.getTime()) {
+                    v = next.getOther().getVelocity().getMod();
+                    break;
+                }
+            }
+            dto.setvSim(v);
+        }
+
+
+        VelocityContainerDto c = new VelocityContainerDto(params.getId(), MathHelper.calculateMSE(velocities, v -> Pair.of(v.getvSim(),v.getvExp())),velocities);
+        return c;
+
+
+    }
+
+    public double getTauMax() {
+        return tauMax;
+    }
+
+    public void setTauMax(double tauMax) {
+        this.tauMax = tauMax;
+    }
+
+    public double getDeltaTau() {
+        return deltaTau;
+    }
+
+    public void setDeltaTau(double deltaTau) {
+        this.deltaTau = deltaTau;
+    }
+
+    private double tauMax;
+    private double deltaTau;
+    private static void tauErrors(Parameters params) {
+           ObjectMapper objectMapper = new ObjectMapper();
+           List<TauErrorDto> errors = new ArrayList<>();
+           double startTime = params.getStartTime();
+           double endTime = params.getEndTime();
+           int id = params.getId();
+        for (double tau = params.getTau() ; tau <= params.getTauMax() ; tau+= params.getDeltaTau()) {
+            params.setTau(tau);
+            VelocityContainerDto c = getVelocityComp(params);
+            double error = c.getError();
+            errors.add(new TauErrorDto(tau, error));
+        }
+
+
+          try {
+            objectMapper.writeValue(new File(appendValue(params.getTauErrorOutput(), id)),new TauErrorContainerDto(id, errors, startTime, endTime));
+              // Write file
+          } catch (Exception e) {
+              throw new RuntimeException(e);
+          }
+      }
+
+       private static void velocityComp(Parameters params) {
 
 
            ObjectMapper objectMapper = new ObjectMapper();
@@ -233,6 +304,16 @@ public class Parameters {
               throw new RuntimeException(e);
           }
       }
+
+    public String getTauErrorOutput() {
+        return tauErrorOutput;
+    }
+
+    public void setTauErrorOutput(String tauErrorOutput) {
+        this.tauErrorOutput = tauErrorOutput;
+    }
+
+    private String tauErrorOutput;
 
       private static List<VelocityDto> getExperimentVelocity(Parameters params) {
 
@@ -279,6 +360,7 @@ public class Parameters {
               throw new RuntimeException(e);
           }
       }
+
 
 
 
