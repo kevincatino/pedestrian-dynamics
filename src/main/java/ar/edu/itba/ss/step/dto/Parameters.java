@@ -120,7 +120,7 @@ public class Parameters {
 
             while ((line = br.readLine()) != null) {
                 String[] values = line.trim().split("\\s+");  // Split by whitespace
-                double time = Double.parseDouble(values[0])*(4.0/30);
+                double time = (Double.parseDouble(values[0])-1)*(4.0/30);
                 pedestrians.putIfAbsent(time, new TreeSet<>());
                 pedestrians.get(time).add(new PedestrianDto(Double.parseDouble(values[2]),
                         -Double.parseDouble(values[1]), initialId + (int)Double.parseDouble(values[3])));
