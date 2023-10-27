@@ -5,7 +5,7 @@ from visualizations.animation.utils import *
 import matplotlib.pyplot as plt
 
 save_frames = False
-framerate = 30/4
+framerate = 30 / 4
 save_video = True
 frames_folder = "frames"
 output_video_filename = "animation.mp4"
@@ -13,7 +13,7 @@ show_frame_time = False
 show_particle_id = False
 show_targets = True
 
-targets = [(1,1), (2,2)]
+targets = [(-12.59, -6.05), (-10.27, -6.46), (-12.62, 0.02), (-9.62, 0.06), (-3.03, -6.29), (-3.26, -0.05), (-9.71, 6.45), (-12.59, 6.44), (-3.69, 6.53), (2.99, 6.37), (9.97, 6.44), (12.57, 6.24), (3.13, -6.38), (3.18, 0.21), (12.59, 0.5), (10.3, 0.5), (10.3, -6.82), (12.58, -6.67)]
 
 frames = parse_pedestrian_json()
 total_ids = get_ids_count(frames)
@@ -65,7 +65,7 @@ for frame in frames:
         for target in targets:
             x, y = target
             plt.plot(x, y, marker='x', markersize=8, color='red')
-            plt.text(x, y, f'({x}, {y})', fontsize=8, color='black', ha='right', va='bottom')
+            plt.text(x, y, f'({x}, {y})', fontsize=8, color='black', ha='center', va='bottom')
 
     plt.savefig(f"{frames_folder}/frame_{index}.png")
     plt.close()
