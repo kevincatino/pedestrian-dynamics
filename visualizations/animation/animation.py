@@ -9,6 +9,7 @@ framerate = 20
 save_video = True
 frames_folder = "frames"
 output_video_filename = "animation.mp4"
+show_frame_time = False
 
 frames = parse_pedestrian_json()
 total_ids = get_ids_count(frames)
@@ -42,12 +43,17 @@ for frame in frames:
         state_by_id[id]['y'] = state_by_id[id]['y'][-5:]
 
         plt.plot(state_by_id[id]['x'], state_by_id[id]['y'], color=f'C{id % total_ids}', alpha=0.5)
-        plt.plot(x, y, 'ro', markersize=5)
+        plt.plot(x, y, 'o', markersize=5, color=f'C{id % total_ids}')
+        plt.text(x, y, f'ID: {id}', fontsize=8, color='black', ha='right', va='bottom')
 
     plt.xlabel('Coordenada X')
     plt.ylabel('Coordenada Y')
+
+    if show_frame_time:
+        plt.text(13, 11, f't={frame.get_time()}s', fontsize=12, color='black', ha='right', va='top')
+
     plt.xlim(-15, 15)
-    plt.ylim(-8, 8)
+    plt.ylim(-8, 12) if show_frame_time else plt.ylim(-8, 8)
 
     plt.savefig(f"{frames_folder}/frame_{index}.png")
     plt.close()

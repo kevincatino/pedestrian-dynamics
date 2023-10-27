@@ -2,8 +2,10 @@ package ar.edu.itba.ss.step.dto;
 
 import ar.edu.itba.ss.step.models.Pair;
 import ar.edu.itba.ss.step.models.Pedestrian;
-import ar.edu.itba.ss.step.models.SFM;
-import ar.edu.itba.ss.step.models.Simulation;
+import ar.edu.itba.ss.step.models.SFMStepProcessor;
+import ar.edu.itba.ss.step.models.SimulationEngine;
+import ar.edu.itba.ss.step.models.StepProcessor;
+import ar.edu.itba.ss.step.models.Vector;
 import ar.edu.itba.ss.step.utils.IO;
 import ar.edu.itba.ss.step.utils.MathHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -15,7 +17,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class Parameters {
 
@@ -120,10 +120,10 @@ public class Parameters {
 
             while ((line = br.readLine()) != null) {
                 String[] values = line.trim().split("\\s+");  // Split by whitespace
-                double time = Double.parseDouble(values[0])*(4.0/30);
+                double time = (Double.parseDouble(values[0])-1)*(4.0/30);
                 pedestrians.putIfAbsent(time, new TreeSet<>());
                 pedestrians.get(time).add(new PedestrianDto(Double.parseDouble(values[2]),
-                        Double.parseDouble(values[1]), initialId + (int)Double.parseDouble(values[3])));
+                        -Double.parseDouble(values[1]), initialId + (int)Double.parseDouble(values[3])));
             }
 
         } catch (IOException e) {
@@ -193,16 +193,22 @@ public class Parameters {
         this.experimentVelocityCompOutput = experimentVelocityCompOutput;
     }
 
+    private static String appendValue(String fileName, Object value) {
+        String[] splitted = fileName.split("\\.");
+        return splitted[0] + value + "." + splitted[1];
+    }
+
     private String experimentVelocityCompOutput;
     private static void velocityComp(Parameters params) {
 
 
            ObjectMapper objectMapper = new ObjectMapper();
           List<VelocityDto> velocities = getExperimentVelocity(params);
-          Pedestrian p = new Pedestrian(params.getTargetVelocity(), params.getInitialVelocity(), 80);
-        Simulation sim = new SFM(params.getTau());
+          Pedestrian p = new Pedestrian(Vector.of(1800,0), params.getTargetVelocity(), 80);
+        SimulationEngine sim = new SimulationEngine();
+        StepProcessor sfmStepProcessor = new SFMStepProcessor(params.getTau(),0.1);
         double initialTime = -1;
-        Iterator<Pair<Double, Pedestrian>> it = sim.simulate(0.1,params.getEndTime() - params.getStartTime()+1,p);
+        Iterator<Pair<Double, Pedestrian>> it = sim.simulate(p,sfmStepProcessor);
         for (VelocityDto dto : velocities) {
             if (initialTime == -1) {
                 initialTime = dto.getTime();
@@ -211,7 +217,7 @@ public class Parameters {
             while(it.hasNext()) {
                 Pair<Double, Pedestrian> next = it.next();
                 if (next.getOne() + initialTime >= dto.getTime()) {
-                    v = next.getOther().getV();
+                    v = next.getOther().getVelocity().getMod();
                     break;
                 }
             }
@@ -221,7 +227,7 @@ public class Parameters {
           try {
             VelocityContainerDto c = new VelocityContainerDto(params.getId(), MathHelper.calculateMSE(velocities, v -> Pair.of(v.getvSim(),v.getvExp())),velocities);
 
-            objectMapper.writeValue(new File(params.getExperimentVelocityCompOutput()),c);
+            objectMapper.writeValue(new File(appendValue(params.getExperimentVelocityCompOutput(), params.getId())),c);
               // Write file
           } catch (Exception e) {
               throw new RuntimeException(e);
@@ -233,7 +239,7 @@ public class Parameters {
           ObjectMapper objectMapper = new ObjectMapper();
           List<VelocityDto> velocities = new ArrayList<>();
           try {
-               List<TimeInstantDto> instants = objectMapper.readValue(new File(params.getExperimentOutput()),new TypeReference<List<TimeInstantDto>>() {});
+              List<TimeInstantDto> instants = objectMapper.readValue(new File(params.getExperimentOutput()),new TypeReference<>() {});
               List<Map.Entry<Double,PedestrianDto>> filteredInstants = instants.stream().
                       filter(i -> i.getTime() >= params.getStartTime() && i.getTime() <= params.getEndTime()).
                       map(i -> Map.entry(i.getTime(),i.getPedestrian(params.getId()))).toList();
@@ -246,6 +252,7 @@ public class Parameters {
 
                   double v = Math.sqrt(Math.pow(i.getValue().getX() - prev.getValue().getX(),2) + Math.pow(i.getValue().getY() - prev.getValue().getY(),2)) / (i.getKey() - prev.getKey());
                   velocities.add(new VelocityDto(i.getKey(), v));
+                  prev = i;
               }
           } catch(RuntimeException | IOException e) {
               throw new RuntimeException(e);
@@ -265,7 +272,7 @@ public class Parameters {
 
 
               VelocityContainerDto c = new VelocityContainerDto(params.getId(), 0,velocities);
-            objectMapper.writeValue(new File(params.getExperimentVelocityOutput()), c);
+            objectMapper.writeValue(new File(appendValue(params.getExperimentVelocityOutput(), params.getId())), c);
 
               // Write file
           } catch (Exception e) {
