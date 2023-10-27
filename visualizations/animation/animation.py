@@ -5,11 +5,15 @@ from visualizations.animation.utils import *
 import matplotlib.pyplot as plt
 
 save_frames = False
-framerate = 20
+framerate = 30/4
 save_video = True
 frames_folder = "frames"
 output_video_filename = "animation.mp4"
 show_frame_time = False
+show_particle_id = False
+show_targets = True
+
+targets = [(1,1), (2,2)]
 
 frames = parse_pedestrian_json()
 total_ids = get_ids_count(frames)
@@ -44,7 +48,9 @@ for frame in frames:
 
         plt.plot(state_by_id[id]['x'], state_by_id[id]['y'], color=f'C{id % total_ids}', alpha=0.5)
         plt.plot(x, y, 'o', markersize=5, color=f'C{id % total_ids}')
-        plt.text(x, y, f'ID: {id}', fontsize=8, color='black', ha='right', va='bottom')
+
+        if show_particle_id:
+            plt.text(x, y, f'ID: {id}', fontsize=8, color='black', ha='right', va='bottom')
 
     plt.xlabel('Coordenada X')
     plt.ylabel('Coordenada Y')
@@ -54,6 +60,12 @@ for frame in frames:
 
     plt.xlim(-15, 15)
     plt.ylim(-8, 12) if show_frame_time else plt.ylim(-8, 8)
+
+    if show_targets:
+        for target in targets:
+            x, y = target
+            plt.plot(x, y, marker='x', markersize=8, color='red')
+            plt.text(x, y, f'({x}, {y})', fontsize=8, color='black', ha='right', va='bottom')
 
     plt.savefig(f"{frames_folder}/frame_{index}.png")
     plt.close()
