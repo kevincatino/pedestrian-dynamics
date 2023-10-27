@@ -123,7 +123,7 @@ public class Parameters {
                 double time = Double.parseDouble(values[0])*(4.0/30);
                 pedestrians.putIfAbsent(time, new TreeSet<>());
                 pedestrians.get(time).add(new PedestrianDto(Double.parseDouble(values[2]),
-                        Double.parseDouble(values[1]), initialId + (int)Double.parseDouble(values[3])));
+                        -Double.parseDouble(values[1]), initialId + (int)Double.parseDouble(values[3])));
             }
 
         } catch (IOException e) {
