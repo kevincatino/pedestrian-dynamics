@@ -262,6 +262,59 @@ public class Parameters {
                         Pair.of(23.7, targets.get(14)),
                         Pair.of(30.7, targets.get(16)),
                         Pair.of(Double.MAX_VALUE, targets.get(15)))
+                ),
+                entry(6, new TargetHelper(
+                        Pair.of(2.4, targets.get(21)),
+                        Pair.of(5.7, targets.get(9)),
+                        Pair.of(16.8, targets.get(2)),
+                        Pair.of(19.2, targets.get(1)),
+                        Pair.of(28.7, targets.get(8)),
+                        Pair.of(Double.MAX_VALUE, targets.get(6)))
+                ),
+                entry(7, new TargetHelper(
+                        Pair.of(5.7, targets.get(14)),
+                        Pair.of(5.7, targets.get(9)),
+                        Pair.of(11.9, targets.get(7)),
+                        Pair.of(18.5, targets.get(2)),
+                        Pair.of(25.9, targets.get(3)),
+                        Pair.of(Double.MAX_VALUE, targets.get(5)))
+                ),
+                entry(8, new TargetHelper(
+                        Pair.of(0.8, targets.get(9)),
+                        Pair.of(5.3, targets.get(10)),
+                        Pair.of(12.5, targets.get(11)),
+                        Pair.of(18.9, targets.get(16)),
+                        Pair.of(26.3, targets.get(13)),
+                        Pair.of(Double.MAX_VALUE, targets.get(4)))
+                ),
+                entry(9, new TargetHelper(
+                        Pair.of(6.7, targets.get(3)),
+                        Pair.of(13.1, targets.get(2)),
+                        Pair.of(21.9, targets.get(19)),
+                        Pair.of(27.9, targets.get(13)),
+                        Pair.of(Double.MAX_VALUE, targets.get(13)))
+                ),
+                entry(10, new TargetHelper(
+                        Pair.of(1.6, targets.get(20)),
+                        Pair.of(4.0, targets.get(14)),
+                        Pair.of(10.0, targets.get(11)),
+                        Pair.of(21.3, targets.get(7)),
+                        Pair.of(27.5, targets.get(21)),
+                        Pair.of(Double.MAX_VALUE, targets.get(11)))
+                ),
+                entry(11, new TargetHelper(
+                        Pair.of(4.8, targets.get(6)),
+                        Pair.of(12.1, targets.get(10)),
+                        Pair.of(21.2, targets.get(16)),
+                        Pair.of(24.0, targets.get(15)),
+                        Pair.of(29.6, targets.get(17)),
+                        Pair.of(Double.MAX_VALUE, targets.get(13)))
+                ),
+                entry(12, new TargetHelper(
+                        Pair.of(5.2, targets.get(8)),
+                        Pair.of(16.1, targets.get(20)),
+                        Pair.of(27.5, targets.get(12)),
+                        Pair.of(Double.MAX_VALUE, targets.get(21)))
                 )
         );
 
