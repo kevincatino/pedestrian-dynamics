@@ -28,6 +28,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 
+import static java.util.Map.entry;
+
 public class Parameters {
 
 
@@ -179,23 +181,67 @@ public class Parameters {
               if (count == -1)
                   count = entry.getValue().size();
               if (entry.getValue().size() == count)
-                timeInstantDtoList.add(new TimeInstantDto(entry.getKey(),entry.getValue().values()));
+                  timeInstantDtoList.add(new TimeInstantDto(entry.getKey(),entry.getValue().values()));
           }
           return timeInstantDtoList;
     }
 
     private static Vector getTarget(PedestrianDto dto, double time) {
-        Map<Integer,Vector> targets = Map.of(
-                1, Vector.of(0,0)
+
+        //
+        //targets = [(-12.8, -6.5), (-9.6, -6.5), (-12.8, 0), (-9.6, 0), (-3.3, -6.5), (-3.3, 0), (-9.6, 6.5),
+        //(-12.8, 6.5), (-3.3, 6.5), (3.15, 6.5), (10, 6.5), (12.5, 6.5), (3.15, -6.5), (3.15, 0),
+        //(12.5, 0), (10, 0), (10, -6.5), (12.5, -6.5)]
+
+        Map<Integer,Vector> targets = Map.ofEntries(
+                entry(1, Vector.of(-12.8,-6.5)),
+                entry(2, Vector.of(-9.6,-6.5)),
+                entry(3, Vector.of(-12.8,0)),
+                entry(4, Vector.of(-9.6,0)),
+                entry(5, Vector.of(-3.3,-6.5)),
+                entry(6, Vector.of(-3.3, 0)),
+                entry(7, Vector.of(-9.6, 6.5)),
+                entry(8, Vector.of(-12.8, 6.5)),
+                entry(9, Vector.of(-3.3, 6.5)),
+                entry(10, Vector.of(3.15, 6.5)),
+                entry(11, Vector.of(10, 6.5)),
+                entry(12, Vector.of(12.5, 6.5)),
+                entry(13, Vector.of(3.15, -6.5)),
+                entry(14, Vector.of(3.15, 0)),
+                entry(15, Vector.of(12.5, 0)),
+                entry(16, Vector.of(10, 0)),
+                entry(17, Vector.of(10, -6.5)),
+                entry(18, Vector.of(12.5, -6.5)),
+                entry(19, Vector.of(0.0, -3.5)),
+                entry(20, Vector.of(0.0, 0.0)),
+                entry(21, Vector.of(0.0, 3.5))
         );
-        Map<Integer, TargetHelper> helpers = Map.of(
-                0, new TargetHelper(Pair.of(5.0,Vector.of(0,0)))
+        Map<Integer, TargetHelper> helpers = Map.ofEntries(
+                entry(0, new TargetHelper(
+                        Pair.of(1.9,targets.get(7)),
+                        Pair.of(7.7, targets.get(9)),
+                        Pair.of(15.7, targets.get(14)),
+                        Pair.of(23.7, targets.get(17)),
+                        Pair.of(29.2, targets.get(16)),
+                        Pair.of(Double.MAX_VALUE, targets.get(10)))
+                ),
+                entry(1, new TargetHelper(
+                        Pair.of(4.7, targets.get(7)),
+                        Pair.of(7.7, targets.get(8)),
+                        Pair.of(13.1, targets.get(3)),
+                        Pair.of(16.4, targets.get(4)),
+                        Pair.of(22.2, targets.get(6)),
+                        Pair.of(26.7, targets.get(19)),
+                        Pair.of(30.7, targets.get(13)),
+                        Pair.of(Double.MAX_VALUE, targets.get(17)))
+                )
+
         );
 
         return Vector.of(0,0);
 
-//        return helpers.get(dto.getId()).getTarget(time);
-
+//        Vector v =  helpers.get(dto.getId()).getTarget(time);
+//        return v;
     }
 
 
@@ -363,7 +409,7 @@ public class Parameters {
               List<TimeInstantDto> instants = objectMapper.readValue(new File(params.getExperimentOutput()),new TypeReference<>() {});
               List<Map.Entry<Double,PedestrianDto>> filteredInstants = instants.stream().
                       filter(i -> i.getTime() >= params.getStartTime() && i.getTime() <= params.getEndTime()).
-                      map(i -> Map.entry(i.getTime(),i.getPedestrian(params.getId()))).toList();
+                      map(i -> entry(i.getTime(),i.getPedestrian(params.getId()))).toList();
               Map.Entry<Double,PedestrianDto> prev = null;
               for (Map.Entry<Double,PedestrianDto> i : filteredInstants) {
                   if (prev == null) {
