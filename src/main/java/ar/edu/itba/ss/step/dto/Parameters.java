@@ -234,8 +234,35 @@ public class Parameters {
                         Pair.of(26.7, targets.get(19)),
                         Pair.of(30.7, targets.get(13)),
                         Pair.of(Double.MAX_VALUE, targets.get(17)))
+                ),
+                entry(2, new TargetHelper(
+                        Pair.of(6.1, targets.get(11)),
+                        Pair.of(21.6, targets.get(3)),
+                        Pair.of(Double.MAX_VALUE, targets.get(13)))
+                ),
+                entry(3, new TargetHelper(
+                        Pair.of(8.0, targets.get(4)),
+                        Pair.of(14.1, targets.get(1)),
+                        Pair.of(23.9, targets.get(20)),
+                        Pair.of(30.0, targets.get(10)),
+                        Pair.of(Double.MAX_VALUE, targets.get(4)))
+                ),
+                entry(4, new TargetHelper(
+                        Pair.of(2.7, targets.get(14)),
+                        Pair.of(8.4, targets.get(10)),
+                        Pair.of(18.1, targets.get(4)),
+                        Pair.of(24.7, targets.get(5)),
+                        Pair.of(30.3, targets.get(2)),
+                        Pair.of(Double.MAX_VALUE, targets.get(6)))
+                ),
+                 entry(5, new TargetHelper(
+                        Pair.of(1.1, targets.get(6)),
+                        Pair.of(8.1, targets.get(2)),
+                        Pair.of(18.7, targets.get(13)),
+                        Pair.of(23.7, targets.get(14)),
+                        Pair.of(30.7, targets.get(16)),
+                        Pair.of(Double.MAX_VALUE, targets.get(15)))
                 )
-
         );
 
         return Vector.of(0,0);
