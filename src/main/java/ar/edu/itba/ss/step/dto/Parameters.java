@@ -315,13 +315,103 @@ public class Parameters {
                         Pair.of(16.1, targets.get(20)),
                         Pair.of(27.5, targets.get(12)),
                         Pair.of(Double.MAX_VALUE, targets.get(21)))
+                ),
+                entry(13, new TargetHelper(
+                        Pair.of(1.1, targets.get(4)),
+                        Pair.of(6.1, targets.get(2)),
+                        Pair.of(9.2, targets.get(1)),
+                        Pair.of(20.4, targets.get(20)),
+                        Pair.of(27.5, targets.get(10)),
+                        Pair.of(Double.MAX_VALUE, targets.get(11)))
+                ),
+                entry(14, new TargetHelper(
+                        Pair.of(4.7, targets.get(1)),
+                        Pair.of(10.8, targets.get(4)),
+                        Pair.of(15.7, targets.get(6)),
+                        Pair.of(25.2, targets.get(10)),
+                        Pair.of(Double.MAX_VALUE, targets.get(16)))
+                ),
+                entry(15, new TargetHelper(
+                        Pair.of(2.7, targets.get(6)),
+                        Pair.of(11.6, targets.get(17)),
+                        Pair.of(20.5, targets.get(10)),
+                        Pair.of(27.7, targets.get(15)),
+                        Pair.of(Double.MAX_VALUE, targets.get(9)))
+                ),
+                entry(16, new TargetHelper(
+                        Pair.of(7.1, targets.get(13)),
+                        Pair.of(12.3, targets.get(14)),
+                        Pair.of(16.8, targets.get(21)),
+                        Pair.of(21.7, targets.get(10)),
+                        Pair.of(27.7, targets.get(11)),
+                        Pair.of(30.5, targets.get(12)),
+                        Pair.of(Double.MAX_VALUE, targets.get(15)))
+                ),
+                entry(17, new TargetHelper(
+                        Pair.of(7.5, targets.get(17)),
+                        Pair.of(13.1, targets.get(15)),
+                        Pair.of(18.4, targets.get(11)),
+                        Pair.of(21.2, targets.get(12)),
+                        Pair.of(23.8, targets.get(11)),
+                        Pair.of(31.2, targets.get(14)),
+                        Pair.of(Double.MAX_VALUE, targets.get(19)))
+                ),
+                entry(18, new TargetHelper(
+                        Pair.of(1.6, targets.get(19)),
+                        Pair.of(9.1, targets.get(9)),
+                        Pair.of(13.9, targets.get(7)),
+                        Pair.of(18.4, targets.get(3)),
+                        Pair.of(23.4, targets.get(2)),
+                        Pair.of(30.7, targets.get(20)),
+                        Pair.of(Double.MAX_VALUE, targets.get(16)))
+                ),
+                 entry(19, new TargetHelper(
+                        Pair.of(9.3, targets.get(18)),
+                        Pair.of(15.7, targets.get(16)),
+                        Pair.of(23.2, targets.get(10)),
+                        Pair.of(28.8, targets.get(9)),
+                        Pair.of(Double.MAX_VALUE, targets.get(4)))
+                ),
+                entry(20, new TargetHelper(
+                        Pair.of(2.0, targets.get(13)),
+                        Pair.of(6.4, targets.get(19)),
+                        Pair.of(17.7, targets.get(7)),
+                        Pair.of(29.5, targets.get(19)),
+                        Pair.of(Double.MAX_VALUE, targets.get(5)))
+                ),
+                entry(21, new TargetHelper(
+                        Pair.of(3.2, targets.get(17)),
+                        Pair.of(12.7, targets.get(12)),
+                        Pair.of(19.3, targets.get(10)),
+                        Pair.of(23.9, targets.get(9)),
+                        Pair.of(28.7, targets.get(7)),
+                        Pair.of(Double.MAX_VALUE, targets.get(4)))
+                ),
+                entry(22, new TargetHelper(
+                        Pair.of(3.6, targets.get(16)),
+                        Pair.of(9.5, targets.get(12)),
+                        Pair.of(17.2, targets.get(16)),
+                        Pair.of(23.5, targets.get(18)),
+                        Pair.of(Double.MAX_VALUE, targets.get(20)))
+                ),
+                entry(23, new TargetHelper(
+                        Pair.of(1.6, targets.get(16)),
+                        Pair.of(7.0, targets.get(18)),
+                        Pair.of(22.7, targets.get(4)),
+                        Pair.of(30.4, targets.get(9)),
+                        Pair.of(Double.MAX_VALUE, targets.get(21)))
+                ),
+                entry(24, new TargetHelper(
+                        Pair.of(2.0, targets.get(15)),
+                        Pair.of(12.2, targets.get(18)),
+                        Pair.of(15.7, targets.get(17)),
+                        Pair.of(24.0, targets.get(16)),
+                        Pair.of(29.2, targets.get(14)),
+                        Pair.of(Double.MAX_VALUE, targets.get(19)))
                 )
         );
 
-        return Vector.of(0,0);
-
-//        Vector v =  helpers.get(dto.getId()).getTarget(time);
-//        return v;
+        return helpers.get(dto.getId()).getTarget(time);
     }
 
 
@@ -379,6 +469,11 @@ public class Parameters {
     private static String appendValue(String fileName, Object value) {
         String[] splitted = fileName.split("\\.");
         return splitted[0] + value + "." + splitted[1];
+    }
+
+    @Override
+    public String toString() {
+        return String.format("-%d-%.2f-%.2f", id, startTime, endTime);
     }
 
     private String experimentVelocityCompOutput;
@@ -449,7 +544,7 @@ public class Parameters {
 
 
           try {
-            objectMapper.writeValue(new File(appendValue(params.getTauErrorOutput(), id)),new TauErrorContainerDto(id, errors, startTime, endTime));
+            objectMapper.writeValue(new File(appendValue(params.getTauErrorOutput(), params)),new TauErrorContainerDto(id, errors, startTime, endTime));
               // Write file
           } catch (Exception e) {
               throw new RuntimeException(e);
@@ -464,7 +559,7 @@ public class Parameters {
 
           try {
 
-            objectMapper.writeValue(new File(appendValue(params.getExperimentVelocityCompOutput(), params.getId())),c);
+            objectMapper.writeValue(new File(appendValue(params.getExperimentVelocityCompOutput(), params)),c);
               // Write file
           } catch (Exception e) {
               throw new RuntimeException(e);
@@ -520,7 +615,7 @@ public class Parameters {
 
 
               VelocityContainerDto c = new VelocityContainerDto(params.getId(), 0,velocities, velocities.get(0).getDa());
-            objectMapper.writeValue(new File(appendValue(params.getExperimentVelocityOutput(), params.getId())), c);
+            objectMapper.writeValue(new File(appendValue(params.getExperimentVelocityOutput(), params)), c);
 
               // Write file
           } catch (Exception e) {
