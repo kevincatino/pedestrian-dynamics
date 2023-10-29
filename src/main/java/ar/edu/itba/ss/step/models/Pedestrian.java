@@ -1,6 +1,9 @@
 package ar.edu.itba.ss.step.models;
 
 
+import ar.edu.itba.ss.step.dto.PedestrianDto;
+import ar.edu.itba.ss.step.utils.Constants;
+
 public class Pedestrian {
     private final double vd;
 
@@ -25,14 +28,9 @@ public class Pedestrian {
     private Vector position;
 
     public Vector geteTarget() {
-        return eTarget;
+        return targetProvider.getTarget(this).normalize();
     }
 
-    public void seteTarget(Vector eTarget) {
-        this.eTarget = eTarget;
-    }
-
-    private Vector eTarget;
 
     public double getVd() {
         return vd;
@@ -44,23 +42,36 @@ public class Pedestrian {
 
     private final double mass;
 
-    public Pedestrian(Vector eTarget, Vector position, double vd, double initialV, double mass) {
-        this.eTarget = eTarget.normalize();
+    private final TargetProvider targetProvider;
+
+    public Pedestrian(TargetProvider targetProvider, Vector position, double vd, double initialV, double mass) {
+        this.targetProvider = targetProvider;
         this.vd = vd;
         this.position = position;
         this.mass = mass;
-        this.velocity = eTarget.scale(initialV);
+        this.velocity = geteTarget().scale(initialV);
     }
 
-    public Pedestrian(Vector eTarget, double vd,  double mass) {
-       this(eTarget,Vector.of(0,0), vd, 0, mass);
+   public static Pedestrian fromDto(PedestrianDto dto) {
+        Pedestrian p =  new Pedestrian(new SimpleTargetProvider(Vector.of(dto.getTargetX(), dto.getTargetY())),
+                Vector.of(dto.getX(), dto.getY()), 0, 0, Constants.MASS);
+        p.velocity = Vector.of(dto.getVx(), dto.getVy());
+        return p;
+   }
+
+    public Pedestrian(TargetProvider targetProvider, double vd,  double mass) {
+       this(targetProvider,Vector.of(0,0), vd, 0, mass);
     }
 
     public Pedestrian clone() {
-        Pedestrian clone =  new Pedestrian(eTarget, vd, mass);
+        Pedestrian clone =  new Pedestrian(targetProvider, vd, mass);
         clone.position = position;
         clone.velocity = velocity;
         return clone;
+    }
+
+    public boolean isColliding(Pedestrian other) {
+        return other.position.substract(position).getMod() < 2* Constants.RADIUS;
     }
 
 

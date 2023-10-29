@@ -1,12 +1,16 @@
 {
-  "runner": "experimentVelocity" | "parseRawFiles" | "velocityComp"
-  "startTime": 2,
-  "endTime": 6,
-  "id": 0,
+  "runner": "experimentVelocity" | "parseRawFiles" | "velocityComp" | "tauErrors"
+  "startTime": 18.6,
+  "endTime": 20.5,
+  "id": 5,
   "experimentOutput": "pedestrians.json",
   "experimentVelocityOutput": "expVelocity.json",
   "experimentVelocityCompOutput": "compVelocity.json",
-  "tau": 0.5,
+  "tauErrorOutput": "tauError.json",
+  "tau": 0.26,
+  "tauMax": 5,
+  "deltaTau": 0.01,
   "initialVelocity": 0,
   "targetVelocity": 1.1
+
 }

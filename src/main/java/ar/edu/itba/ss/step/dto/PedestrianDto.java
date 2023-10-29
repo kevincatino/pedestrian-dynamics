@@ -32,6 +32,45 @@ public class PedestrianDto implements Comparable<PedestrianDto> {
     private double x;
     private double y;
 
+    public double getTargetX() {
+        return targetX;
+    }
+
+    public void setTargetX(double targetX) {
+        this.targetX = targetX;
+    }
+
+    public double getTargetY() {
+        return targetY;
+    }
+
+    public void setTargetY(double targetY) {
+        this.targetY = targetY;
+    }
+
+    private double targetX;
+    private double targetY;
+
+    private double vx;
+
+    public double getVx() {
+        return vx;
+    }
+
+    public void setVx(double vx) {
+        this.vx = vx;
+    }
+
+    public double getVy() {
+        return vy;
+    }
+
+    public void setVy(double vy) {
+        this.vy = vy;
+    }
+
+    private double vy;
+
     public PedestrianDto(double x, double y,  int id) {
         this.x = x;
         this.y = y;
