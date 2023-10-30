@@ -22,6 +22,23 @@ public interface MathHelper {
         double mse = sumOfSquaredErrors / dataPoints.size();
         return mse;
     }
+
+    static <V> double calculateWeightedMSE(List<V> dataPoints, Function<V, Pair<Double,Double>> mapper, List<Double> weights) {
+        if (dataPoints.isEmpty()) {
+            throw new IllegalArgumentException("List is empty");
+        }
+
+        double sumOfSquaredErrors = 0.0;
+        int idx = 0;
+        for (V dataPoint : dataPoints) {
+            Pair<Double,Double> pair = mapper.apply(dataPoint);
+            double error = pair.getOne() - pair.getOther();
+            sumOfSquaredErrors += weights.get(idx)*Math.pow(error, 2);
+        }
+
+        double mse = sumOfSquaredErrors / weights.stream().reduce((a,b)->a+b).get();
+        return mse;
+    }
     static double calculateSD(List<Double> numArray)
     {
         double sum = 0.0, standardDeviation = 0.0;
