@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -506,9 +507,15 @@ public class Parameters {
             }
             dto.setvSim(v);
         }
+        List<Double> weights = new ArrayList<>();
+        for (VelocityDto d : velocities) {
+            weights.add(1.0);
+        }
+        weights.set(0, 10.0);
+        weights.set(weights.size()-1, 10.0);
 
 
-        VelocityContainerDto c = new VelocityContainerDto(params.getId(), MathHelper.calculateMSE(velocities, v -> Pair.of(v.getvSim(),v.getvExp())),velocities,da);
+        VelocityContainerDto c = new VelocityContainerDto(params.getId(), MathHelper.calculateWeightedMSE(velocities, v -> Pair.of(v.getvSim(),v.getvExp()), weights),velocities,da);
         return c;
 
 
