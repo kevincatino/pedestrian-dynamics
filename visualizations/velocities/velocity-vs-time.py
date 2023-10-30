@@ -3,7 +3,7 @@ import math
 from matplotlib import pyplot as plt
 
 prefix = '../../'
-file = 'expVelocity12.json'
+file = 'expVelocity2.json'
 
 fig, ax = plt.subplots()
 
@@ -13,11 +13,12 @@ json_input = json.load(f)
 time = []
 vel = []
 
-vd_min = 0
-vd_max = 1.49
+vd_min = 0.21
+vd_max = 1.65
 
-ts = [13.5, 16.2, 16.3, 18.5,
-      						25, 27.6, 27.8, 29.6]
+ts = [4.8, 6, 6.4, 9.3,
+						19.9, 21.6, 22, 24.6]
+
 
 
 colors = ["red", "blue", "green", "brown", "orange", "purple", "cyan", "brown", "gray", "blue"]
@@ -33,7 +34,7 @@ for v in json_input['velocities']:
 ax.plot(time, vel,   label=f'id={str(json_input["id"])}')
 
 if horizontal_line:
-    ax.axhline(y=vd_min, color='red', linestyle='--', label=f'$v^{{min}}$ = {vd_min}$\\frac{{m}}{{s}}$')
+    #ax.axhline(y=vd_min, color='red', linestyle='--', label=f'$v^{{min}}$ = {vd_min}$\\frac{{m}}{{s}}$')
     ax.axhline(y=vd_max, color='red', linestyle='--', label=f'$v^{{max}}$ = {vd_max}$\\frac{{m}}{{s}}$')
 
 if vertical_lines:
@@ -45,7 +46,7 @@ if vertical_lines:
 ax.set_xlabel(r'Tiempo $[s]$')
 ax.set_ylabel(r'Velocidad $[\frac{m}{s}]$')
 ax.grid(False)
-# ax.legend(loc='center left', bbox_to_anchor=(0, 0.4))
+ax.legend(loc='center left', bbox_to_anchor=(0.8, 0.4))
 ax.set_title(f'id={str(json_input["id"])}')
 
 

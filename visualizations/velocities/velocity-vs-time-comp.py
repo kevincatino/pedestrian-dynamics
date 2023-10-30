@@ -3,7 +3,7 @@ import json
 from matplotlib import pyplot as plt
 
 prefix = '../../'
-file = 'compVelocity-4-1.10-2.60.json'
+file = 'compVelocity-10-8.80-9.90.json'
 
 fig, ax = plt.subplots()
 
@@ -31,4 +31,9 @@ ax.set_xlabel(r'Tiempo $[s]$')
 ax.set_ylabel(r'Velocidad $[\frac{m}{s}]$')
 ax.grid(False)
 plt.legend()
+
+nombre_de_archivo = f'tp5-velocity-comp-id-{json_input["id"]}.png'
+
+plt.savefig(nombre_de_archivo)
+
 plt.show()

@@ -5,7 +5,7 @@ import os
 import matplotlib.pyplot as plt
 
 prefix = '../../'
-file = 'tauError-id2-t1-a-2-3.50-6.00.json'
+file = 'tauError-id2-t1-a-10-8.80-9.90.json'
 
 f = open(prefix + file)
 data = json.load(f)
