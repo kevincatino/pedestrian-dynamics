@@ -6,9 +6,15 @@ import java.util.Set;
 
 public class SFMStepProcessor implements StepProcessor {
     private final double tau;
+    private final double da;
+
+    public SFMStepProcessor(double tau, double da) {
+        this.tau = tau;
+        this.da = da;
+    }
 
     public SFMStepProcessor(double tau) {
-        this.tau = tau;
+        this(tau, 0);
     }
 
 
@@ -33,6 +39,11 @@ public class SFMStepProcessor implements StepProcessor {
 
     @Override
     public void advance(Pedestrian pedestrian, Set<Pedestrian> otherPedestrians, double delta) {
+//        double distanceToTarget = pedestrian.getDistanceToTarget();
+//            if (distanceToTarget <= da) {
+//                pedestrian.setTargetVelocity(0);
+//            }
+
             Vector totalForce = drivingForce(pedestrian).add(collisionForce(pedestrian, otherPedestrians));
             Vector acceleration = totalForce.multiply(1/ pedestrian.getMass());
             Vector newPosition = pedestrian.getPosition().add(pedestrian.getVelocity().multiply(delta)).add(acceleration.multiply(0.5*delta*delta));

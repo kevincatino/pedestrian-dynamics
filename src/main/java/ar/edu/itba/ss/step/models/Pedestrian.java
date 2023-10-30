@@ -5,7 +5,11 @@ import ar.edu.itba.ss.step.dto.PedestrianDto;
 import ar.edu.itba.ss.step.utils.Constants;
 
 public class Pedestrian {
-    private final double vd;
+    private double vd;
+
+    public void setTargetVelocity(double vd) {
+        this.vd = vd;
+    }
 
 
     public Vector getPosition() {
@@ -31,7 +35,9 @@ public class Pedestrian {
         return targetProvider.getTarget(this).normalize();
     }
 
-
+    public double getDistanceToTarget() {
+        return targetProvider.getTarget(this).getDistanceTo(position);
+    }
     public double getVd() {
         return vd;
     }

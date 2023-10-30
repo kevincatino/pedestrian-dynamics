@@ -1,6 +1,7 @@
 package ar.edu.itba.ss.step.dto;
 
 import ar.edu.itba.ss.step.models.Pair;
+import ar.edu.itba.ss.step.models.PathTargetProvider;
 import ar.edu.itba.ss.step.models.Pedestrian;
 import ar.edu.itba.ss.step.models.SFMStepProcessor;
 import ar.edu.itba.ss.step.models.SimpleTargetProvider;
@@ -9,6 +10,7 @@ import ar.edu.itba.ss.step.models.StepProcessor;
 import ar.edu.itba.ss.step.models.TargetHelper;
 import ar.edu.itba.ss.step.models.TargetProvider;
 import ar.edu.itba.ss.step.models.Vector;
+import ar.edu.itba.ss.step.utils.Constants;
 import ar.edu.itba.ss.step.utils.IO;
 import ar.edu.itba.ss.step.utils.MathHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -186,14 +188,7 @@ public class Parameters {
           return timeInstantDtoList;
     }
 
-    private static Vector getTarget(PedestrianDto dto, double time) {
-
-        //
-        //targets = [(-12.8, -6.5), (-9.6, -6.5), (-12.8, 0), (-9.6, 0), (-3.3, -6.5), (-3.3, 0), (-9.6, 6.5),
-        //(-12.8, 6.5), (-3.3, 6.5), (3.15, 6.5), (10, 6.5), (12.5, 6.5), (3.15, -6.5), (3.15, 0),
-        //(12.5, 0), (10, 0), (10, -6.5), (12.5, -6.5)]
-
-        Map<Integer,Vector> targets = Map.ofEntries(
+    private static final Map<Integer,Vector> targets = Map.ofEntries(
                 entry(1, Vector.of(-12.8,-6.5)),
                 entry(2, Vector.of(-9.6,-6.5)),
                 entry(3, Vector.of(-12.8,0)),
@@ -216,6 +211,14 @@ public class Parameters {
                 entry(20, Vector.of(0.0, 0.0)),
                 entry(21, Vector.of(0.0, 3.5))
         );
+
+    private static Vector getTarget(PedestrianDto dto, double time) {
+
+        //
+        //targets = [(-12.8, -6.5), (-9.6, -6.5), (-12.8, 0), (-9.6, 0), (-3.3, -6.5), (-3.3, 0), (-9.6, 6.5),
+        //(-12.8, 6.5), (-3.3, 6.5), (3.15, 6.5), (10, 6.5), (12.5, 6.5), (3.15, -6.5), (3.15, 0),
+        //(12.5, 0), (10, 0), (10, -6.5), (12.5, -6.5)]
+
         Map<Integer, TargetHelper> helpers = Map.ofEntries(
                 entry(0, new TargetHelper(
                         Pair.of(1.9,targets.get(7)),
@@ -480,7 +483,7 @@ public class Parameters {
 
     private static VelocityContainerDto getVelocityComp(Parameters params) {
           List<VelocityDto> velocities = getExperimentVelocity(params);
-          Pedestrian p = new Pedestrian(new SimpleTargetProvider(Vector.of(1800,0)), params.getTargetVelocity(), 80);
+          Pedestrian p = new Pedestrian(new SimpleTargetProvider(Vector.of(1800,0)), Vector.of(0,0), params.getTargetVelocity(), params.getInitialVelocity(),80);
         SimulationEngine sim = new SimulationEngine();
         double da = -1;
         StepProcessor sfmStepProcessor = new SFMStepProcessor(params.getTau());
@@ -609,6 +612,36 @@ public class Parameters {
 
 
           ObjectMapper objectMapper = new ObjectMapper();
+          List<VelocityDto> velocities = getExperimentVelocity(params);
+
+          try {
+
+
+              VelocityContainerDto c = new VelocityContainerDto(params.getId(), 0,velocities, velocities.get(0).getDa());
+            objectMapper.writeValue(new File(appendValue(params.getExperimentVelocityOutput(), params)), c);
+
+              // Write file
+          } catch (Exception e) {
+              throw new RuntimeException(e);
+          }
+      }
+
+    public double getVd() {
+        return vd;
+    }
+
+    public void setVd(double vd) {
+        this.vd = vd;
+    }
+
+    private double vd;
+
+      private static void pedestrianSimulation(Parameters params) {
+
+
+          ObjectMapper objectMapper = new ObjectMapper();
+          // 7, 5, 13, 11
+          Pedestrian pedestrian = new Pedestrian(new PathTargetProvider(targets.get(7), targets.get(5), targets.get(13), targets.get(11)), targets.get(17), params.getVd(), 0, Constants.MASS);
           List<VelocityDto> velocities = getExperimentVelocity(params);
 
           try {

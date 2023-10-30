@@ -3,7 +3,7 @@ import json
 from matplotlib import pyplot as plt
 
 prefix = '../../'
-file = 'compVelocity5.json'
+file = 'compVelocity-4-1.10-2.60.json'
 
 fig, ax = plt.subplots()
 
