@@ -3,7 +3,7 @@ import math
 from matplotlib import pyplot as plt
 
 prefix = '../../'
-file = 'expVelocity20.json'
+file = 'expVelocity12.json'
 
 fig, ax = plt.subplots()
 
@@ -13,11 +13,12 @@ json_input = json.load(f)
 time = []
 vel = []
 
-vd_min = 0.25
-vd_max = 1.62
+vd_min = 0
+vd_max = 1.49
 
-ts = [11.1, 12.4,12.5, 14.5,
-      22.8, 23.8, 24, 25.2]
+ts = [13.5, 16.2, 16.3, 18.5,
+      						25, 27.6, 27.8, 29.6]
+
 
 colors = ["red", "blue", "green", "brown", "orange", "purple", "cyan", "brown", "gray", "blue"]
 vertical_lines = True
