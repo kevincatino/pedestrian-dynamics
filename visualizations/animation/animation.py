@@ -9,9 +9,9 @@ framerate = 30 / 4
 save_video = True
 frames_folder = "frames"
 output_video_filename = "animation.mp4"
-show_frame_time = True
-show_particle_id = True
-show_targets = True
+show_frame_time = False
+show_particle_id = False
+show_targets = False
 
 targets = [(-12.8, -6.5), (-9.6, -6.5), (-12.8, 0), (-9.6, 0), (-3.3, -6.5), (-3.3, 0), (-9.6, 6.5),
            (-12.8, 6.5), (-3.3, 6.5), (3.15, 6.5), (10, 6.5), (12.5, 6.5), (3.15, -6.5), (3.15, 0),
@@ -20,9 +20,6 @@ targets = [(-12.8, -6.5), (-9.6, -6.5), (-12.8, 0), (-9.6, 0), (-3.3, -6.5), (-3
 
 frames = parse_pedestrian_json()
 total_ids = get_ids_count(frames)
-
-fig, ax = plt.subplots()
-
 state_by_id = {}
 images = []
 index = 1
@@ -35,10 +32,12 @@ else:
 
 fig, ax = plt.subplots()
 for frame in frames:
+    ax.clear()
     for pedestrian in frame.pedestrians:
         id = pedestrian.get_id()
         x = pedestrian.get_x()
         y = pedestrian.get_y()
+        r = pedestrian.get_r()
 
         if id not in state_by_id:
             state_by_id[id] = {'x': [], 'y': []}
@@ -51,7 +50,7 @@ for frame in frames:
         state_by_id[id]['y'] = state_by_id[id]['y'][-5:]
 
         plt.plot(state_by_id[id]['x'], state_by_id[id]['y'], color=f'C{id % total_ids}', alpha=0.5)
-        plt.plot(x, y, 'o', markersize=5, color=f'C{id % total_ids}')
+        ax.add_patch(plt.Circle((x, y), radius=r, color=f'C{id % total_ids}'))
 
         if show_particle_id:
             plt.text(x, y, f'ID: {id}', fontsize=8, color='black', ha='right', va='bottom')
@@ -72,7 +71,6 @@ for frame in frames:
             plt.text(x, y, f'({x}, {y})\n{idx+1}', fontsize=6, color='black', ha='center', va='bottom')
 
     plt.savefig(f"{frames_folder}/frame_{index}.png")
-    plt.close()
 
     images.append(f'frame_{index}.png')
     index += 1
