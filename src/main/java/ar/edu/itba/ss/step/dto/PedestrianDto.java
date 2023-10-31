@@ -1,5 +1,7 @@
 package ar.edu.itba.ss.step.dto;
 
+import ar.edu.itba.ss.step.models.Pedestrian;
+
 import java.util.Objects;
 
 public class PedestrianDto implements Comparable<PedestrianDto> {
@@ -69,6 +71,16 @@ public class PedestrianDto implements Comparable<PedestrianDto> {
         this.vy = vy;
     }
 
+    public PedestrianDto(int id, double x, double y, double targetX, double targetY, double vx, double vy) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.vx = vx;
+        this.vy = vy;
+    }
+
     private double vy;
 
     public PedestrianDto(double x, double y,  int id) {
@@ -76,7 +88,9 @@ public class PedestrianDto implements Comparable<PedestrianDto> {
         this.y = y;
         this.id = id;
     }
-
+    public static PedestrianDto from(Pedestrian p, int id) {
+        return new PedestrianDto(id, p.getPosition().getX(), p.getPosition().getY(), p.getTarget().getX(), p.getTarget().getY(), p.getVelocity().getX(), p.getVelocity().getY());
+    }
     public PedestrianDto() {
 
     }

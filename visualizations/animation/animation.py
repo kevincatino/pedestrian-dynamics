@@ -33,6 +33,7 @@ if not os.path.exists(frames_folder):
 else:
     print(f"Folder '{frames_folder}' already exists.")
 
+fig, ax = plt.subplots()
 for frame in frames:
     for pedestrian in frame.pedestrians:
         id = pedestrian.get_id()

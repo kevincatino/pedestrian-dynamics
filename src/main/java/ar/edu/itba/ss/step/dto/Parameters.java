@@ -6,6 +6,7 @@ import ar.edu.itba.ss.step.models.Pedestrian;
 import ar.edu.itba.ss.step.models.SFMStepProcessor;
 import ar.edu.itba.ss.step.models.SimpleTargetProvider;
 import ar.edu.itba.ss.step.models.SimulationEngine;
+import ar.edu.itba.ss.step.models.SimulationHeuristic;
 import ar.edu.itba.ss.step.models.StepProcessor;
 import ar.edu.itba.ss.step.models.TargetHelper;
 import ar.edu.itba.ss.step.models.TargetProvider;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
 
@@ -117,6 +120,7 @@ public class Parameters {
         runners.put("experimentVelocity",Parameters::experimentVelocity);
         runners.put("velocityComp",Parameters::velocityComp);
         runners.put("tauErrors",Parameters::tauErrors);
+        runners.put("pedestrianSimulation",Parameters::pedestrianSimulation);
 
     }
 
@@ -184,7 +188,7 @@ public class Parameters {
               if (count == -1)
                   count = entry.getValue().size();
               if (entry.getValue().size() == count)
-                  timeInstantDtoList.add(new TimeInstantDto(entry.getKey(),entry.getValue().values()));
+                  timeInstantDtoList.add(new TimeInstantDto(entry.getKey(),new HashSet<>(entry.getValue().values())));
           }
           return timeInstantDtoList;
     }
@@ -641,21 +645,39 @@ public class Parameters {
         this.vd = vd;
     }
 
+    public String getSimulationOutput() {
+        return simulationOutput;
+    }
+
+    public void setSimulationOutput(String simulationOutput) {
+        this.simulationOutput = simulationOutput;
+    }
+
+    private String simulationOutput;
+
     private double vd;
 
       private static void pedestrianSimulation(Parameters params) {
 
 
+          try {
           ObjectMapper objectMapper = new ObjectMapper();
           // 7, 5, 13, 11
           Pedestrian pedestrian = new Pedestrian(new PathTargetProvider(targets.get(7), targets.get(5), targets.get(13), targets.get(11)), targets.get(17), params.getVd(), 0, Constants.MASS);
-          List<VelocityDto> velocities = getExperimentVelocity(params);
+          List<TimeInstantDto> instants = objectMapper.readValue(new File(params.getExperimentOutput()),new TypeReference<>() {});
+              List<Pair<Double, Set<Pedestrian>>> others = instants.stream().map(i -> Pair.of(i.getTime(), i.getPedestrians().stream().map(Pedestrian::fromDto).collect(Collectors.toSet()))).collect(Collectors.toList());
+              SimulationEngine sim = new SimulationEngine();
+        double da = 1;
+        StepProcessor sfmStepProcessor = new SFMStepProcessor(params.getTau(), da);
+        Iterator<Pair<Double, Pedestrian>> it = sim.simulate(pedestrian,sfmStepProcessor, others, SimulationHeuristic.getDefault());
+        instants.remove(instants.get(instants.size()-1));
+        for (TimeInstantDto dto : instants) {
+            Set<PedestrianDto> pedestrians = new HashSet<>(dto.getPedestrians());
+            pedestrians.add(PedestrianDto.from(it.next().getOther(), -1));
+            dto.setPedestrians(pedestrians);
+        }
 
-          try {
-
-
-              VelocityContainerDto c = new VelocityContainerDto(params.getId(), 0,velocities, velocities.get(0).getDa());
-            objectMapper.writeValue(new File(appendValue(params.getExperimentVelocityOutput(), params)), c);
+            objectMapper.writeValue(new File(params.getSimulationOutput()), instants);
 
               // Write file
           } catch (Exception e) {

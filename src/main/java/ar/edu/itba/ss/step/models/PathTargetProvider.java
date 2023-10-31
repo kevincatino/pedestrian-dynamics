@@ -7,7 +7,7 @@ public class PathTargetProvider implements TargetProvider{
     private final Queue<Vector> nextTargets = new LinkedList<>();
     private Vector target = null;
 
-    private final static double DELTA = 0.1;
+    private final static double DELTA = 0.5;
 
     public PathTargetProvider(Vector... targets) {
         for (Vector target : targets) {
@@ -22,7 +22,9 @@ public class PathTargetProvider implements TargetProvider{
             return target;
         }
 
-        if (p.getPosition().substract(target).getMod() < DELTA) {
+        double distance = p.getPosition().substract(target).getMod();
+
+        if (distance < DELTA) {
             target = nextTargets.poll();
         }
 
