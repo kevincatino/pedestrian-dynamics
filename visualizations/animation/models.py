@@ -1,8 +1,9 @@
 class Pedestrian:
-    def __init__(self, x: float, y: float, id: int):
+    def __init__(self, x: float, y: float, id: int, r=0.3):
         self.x = x
         self.y = y
         self.id = id
+        self.r = r
 
     def get_x(self):
         return self.x
@@ -13,8 +14,15 @@ class Pedestrian:
     def get_id(self):
         return self.id
 
+    def get_r(self):
+        return self.r
+
+    @property
+    def get_diameter(self):
+        return 2 * self.r
+
     def __str__(self):
-        return f"\nPedestrian = ID: {self.id}, Posición: ({self.x}, {self.y})"
+        return f"\nPedestrian = ID: {self.id}, position: ({self.x}, {self.y}), radius: {self.r}m"
 
     def __repr__(self):
         return self.__str__()

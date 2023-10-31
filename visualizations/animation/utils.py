@@ -5,7 +5,7 @@ from visualizations.animation.models import Frame, Pedestrian
 
 
 def parse_pedestrian_json() -> list[Frame]:
-    with open("../../simulation.json") as file:
+    with open("../../pedestrians.json") as file:
         json_input = json.load(file)
 
     frames = []
