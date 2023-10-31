@@ -1,5 +1,6 @@
 package ar.edu.itba.ss.step.dto;
 
+import ar.edu.itba.ss.step.models.CustomSFMHeuristic;
 import ar.edu.itba.ss.step.models.Pair;
 import ar.edu.itba.ss.step.models.PathTargetProvider;
 import ar.edu.itba.ss.step.models.Pedestrian;
@@ -669,7 +670,7 @@ public class Parameters {
               SimulationEngine sim = new SimulationEngine();
         double da = 1;
         StepProcessor sfmStepProcessor = new SFMStepProcessor(params.getTau(), da);
-        Iterator<Pair<Double, Pedestrian>> it = sim.simulate(pedestrian,sfmStepProcessor, others, SimulationHeuristic.getDefault());
+        Iterator<Pair<Double, Pedestrian>> it = sim.simulate(pedestrian,sfmStepProcessor, others, new CustomSFMHeuristic());
         instants.remove(instants.get(instants.size()-1));
         for (TimeInstantDto dto : instants) {
             Set<PedestrianDto> pedestrians = new HashSet<>(dto.getPedestrians());

@@ -36,6 +36,15 @@ public class Pedestrian {
     private Vector velocity;
     private Vector position;
 
+    public Vector getForce() {
+        return force;
+    }
+
+    public void setForce(Vector force) {
+        this.force = force;
+    }
+
+    private Vector force = Vector.of(0,0);
     public Vector geteTarget() {
         return targetProvider.getTarget(this).substract(position).normalize();
     }

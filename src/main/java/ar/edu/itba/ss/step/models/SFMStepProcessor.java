@@ -43,17 +43,18 @@ public class SFMStepProcessor implements StepProcessor {
     @Override
     public void advance(Pedestrian pedestrian, Set<Pedestrian> otherPedestrians, double delta) {
         double distanceToTarget = pedestrian.getDistanceToTarget();
-            if (distanceToTarget <= da && pedestrian.getVelocity().getMod() > 0.1) {
+            if (distanceToTarget <= da && pedestrian.getVelocity().getMod() > 0.4) {
                 pedestrian.arrival();
             } else {
                 pedestrian.departure();
             }
 
-        Vector totalForce = drivingForce(pedestrian).add(collisionForce(pedestrian, otherPedestrians));
+        Vector totalForce = pedestrian.getForce().add(drivingForce(pedestrian).add(collisionForce(pedestrian, otherPedestrians)));
             Vector acceleration = totalForce.multiply(1/ pedestrian.getMass());
             Vector newPosition = pedestrian.getPosition().add(pedestrian.getVelocity().multiply(delta)).add(acceleration.multiply(0.5*delta*delta));
             pedestrian.setPosition(newPosition);
             pedestrian.setVelocity(pedestrian.getVelocity().add(acceleration.multiply(delta)));
+            pedestrian.setForce(Vector.of(0,0));
     }
 
 

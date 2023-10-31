@@ -73,5 +73,9 @@ double currentMod = getMod();
     public double getY() {
         return y;
     }
+
+    public double dotProduct(Vector other) {
+        return x*other.x + y*other.y;
+    }
 }
 
