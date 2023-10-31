@@ -31,4 +31,9 @@ ax.set_xlabel(r'Tiempo $[s]$')
 ax.set_ylabel(r'Velocidad $[\frac{m}{s}]$')
 ax.grid(False)
 plt.legend()
+
+nombre_de_archivo = f'tp5-velocity-comp-id-{json_input["id"]}.png'
+
+plt.savefig(nombre_de_archivo)
+
 plt.show()
