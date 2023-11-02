@@ -24,6 +24,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -122,6 +123,7 @@ public class Parameters {
         runners.put("velocityComp",Parameters::velocityComp);
         runners.put("tauErrors",Parameters::tauErrors);
         runners.put("pedestrianSimulation",Parameters::pedestrianSimulation);
+        runners.put("minDistance",Parameters::minDistance);
 
     }
 
@@ -657,6 +659,57 @@ public class Parameters {
     private String simulationOutput;
 
     private double vd;
+
+    private static Pair<Integer,Double> findMinDistance(Collection<PedestrianDto> pedestrians) {
+        PedestrianDto p = null;
+        for (PedestrianDto o : pedestrians) {
+            if (o.getId() == -1) {
+                p = o;
+                break;
+            }
+        }
+        double minDistance = Double.MAX_VALUE;
+        int id = 0;
+        for (PedestrianDto other : pedestrians) {
+            double d = Vector.of(other.getX(), other.getY()).substract(Vector.of(p.getX(), p.getY())).getMod();
+            if (d < minDistance && other.getId() != p.getId()) {
+                minDistance = d;
+                id = other.getId();
+            }
+        }
+        return Pair.of(id, minDistance);
+    }
+
+    public String getMinDistanceOutput() {
+        return minDistanceOutput;
+    }
+
+    public void setMinDistanceOutput(String minDistanceOutput) {
+        this.minDistanceOutput = minDistanceOutput;
+    }
+
+    private String minDistanceOutput;
+
+     private static void minDistance(Parameters params) {
+
+
+          try {
+          ObjectMapper objectMapper = new ObjectMapper();
+          List<TimeInstantDto> instants = objectMapper.readValue(new File(params.getSimulationOutput()),new TypeReference<>() {});
+          List<MinDistanceDto> minDistances = new ArrayList<>();
+        for (TimeInstantDto dto : instants) {
+            Set<PedestrianDto> pedestrians = new HashSet<>(dto.getPedestrians());
+            Pair<Integer, Double> minDistance = findMinDistance(pedestrians);
+            minDistances.add(new MinDistanceDto(dto.getTime(),minDistance.getOther(), minDistance.getOne()));
+        }
+
+            objectMapper.writeValue(new File(params.getMinDistanceOutput()), minDistances);
+
+              // Write file
+          } catch (Exception e) {
+              throw new RuntimeException(e);
+          }
+      }
 
       private static void pedestrianSimulation(Parameters params) {
 
