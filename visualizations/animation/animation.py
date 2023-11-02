@@ -11,12 +11,12 @@ frames_folder = "frames"
 output_video_filename = "animation.mp4"
 show_frame_time = False
 show_particle_id = False
-show_targets = False
+show_targets = True
 
 targets = [(-12.8, -6.5), (-9.6, -6.5), (-12.8, 0), (-9.6, 0), (-3.3, -6.5), (-3.3, 0), (-9.6, 6.5),
            (-12.8, 6.5), (-3.3, 6.5), (3.15, 6.5), (10, 6.5), (12.5, 6.5), (3.15, -6.5), (3.15, 0),
            (12.5, 0), (10, 0), (10, -6.5), (12.5, -6.5),
-           (0,-3.5), (0,0),(0,3.5)]
+           (0, -3.5), (0, 0), (0, 3.5)]
 
 frames = parse_pedestrian_json()
 total_ids = get_ids_count(frames)
@@ -31,6 +31,7 @@ else:
     print(f"Folder '{frames_folder}' already exists.")
 
 fig, ax = plt.subplots()
+
 for frame in frames:
     ax.clear()
     for pedestrian in frame.pedestrians:
@@ -49,8 +50,12 @@ for frame in frames:
         state_by_id[id]['x'] = state_by_id[id]['x'][-5:]
         state_by_id[id]['y'] = state_by_id[id]['y'][-5:]
 
-        plt.plot(state_by_id[id]['x'], state_by_id[id]['y'], color=f'C{id % total_ids}', alpha=0.5)
-        ax.add_patch(plt.Circle((x, y), radius=r, color=f'C{id % total_ids}'))
+        if id != -1:
+            ax.add_patch(plt.Circle((x, y), radius=r, color=f'C{id % total_ids}', alpha=0.9))
+            plt.plot(state_by_id[id]['x'], state_by_id[id]['y'], color=f'C{id % total_ids}', alpha=0.9)
+        else:
+            ax.add_patch(plt.Circle((x, y), radius=r, color="black", alpha=1))
+            plt.plot(state_by_id[id]['x'], state_by_id[id]['y'], color="black", alpha=1)
 
         if show_particle_id:
             plt.text(x, y, f'ID: {id}', fontsize=8, color='black', ha='right', va='bottom')
@@ -67,8 +72,7 @@ for frame in frames:
     if show_targets:
         for idx, target in enumerate(targets):
             x, y = target
-            plt.plot(x, y, marker='x', markersize=8, color='red')
-            plt.text(x, y, f'({x}, {y})\n{idx+1}', fontsize=6, color='black', ha='center', va='bottom')
+            plt.plot(x, y, marker='x', markersize=8, color='red', alpha=0.3)
 
     plt.savefig(f"{frames_folder}/frame_{index}.png")
 
