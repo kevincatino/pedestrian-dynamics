@@ -32,7 +32,7 @@ public class CustomSFMHeuristic implements SimulationHeuristic {
     }
 
     private static double evaluateForce(double d) {
-          Function<Double,Double> f = (x) -> 500/Math.exp(x);
+          Function<Double,Double> f = (x) -> 800/Math.exp(x);
           if (d > DMAX)
               return 0;
           if (d > DMID) {
@@ -47,21 +47,27 @@ public class CustomSFMHeuristic implements SimulationHeuristic {
     }
     @Override
     public void advance(Pedestrian p, Set<Pedestrian> others, StepProcessor stepProcessor, double delta) {
+        double minCollisionTime = Double.MAX_VALUE;
+        Pedestrian toCollide = null;
         Vector force = Vector.of(0,0);
 
-            for (Pedestrian other : others) {
+        for (Pedestrian other : others) {
             double collisionTime = getCollisionTime(p,other);
             if (collisionTime == Double.MAX_VALUE)
                 continue;
-
-            Vector iFuture = p.getPosition().add(p.getVelocity().multiply(collisionTime));
-            Vector jFuture = other.getPosition().add(other.getVelocity().multiply(collisionTime));
+            if (collisionTime < minCollisionTime) {
+                minCollisionTime = collisionTime;
+                toCollide = other;
+            }
+        }
+        if (toCollide != null) {
+            Vector iFuture = p.getPosition().add(p.getVelocity().multiply(minCollisionTime));
+            Vector jFuture = toCollide.getPosition().add(toCollide.getVelocity().multiply(minCollisionTime));
             Vector deltaR = iFuture.substract(jFuture);
             double d = iFuture.substract(p.getPosition()).getMod() + (iFuture.substract(jFuture).getMod() - Constants.RADIUS*2);
             force = force.add(deltaR.scale(evaluateForce(d)));
-            break;
         }
-            p.setForce(force);
+        p.setForce(force);
 
         stepProcessor.advance(p, others, delta);
     }

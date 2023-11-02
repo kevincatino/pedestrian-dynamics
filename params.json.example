@@ -8,6 +8,7 @@
   "simulationOutput": "simulation.json",
   "experimentVelocityCompOutput": "compVelocity.json",
   "tauErrorOutput": "tauError.json",
+  "minDistanceOutput": "minDistance.json",
   "tau": 0.5,
   "tauMax": 5,
   "deltaTau": 0.01,
