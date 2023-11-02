@@ -34,6 +34,7 @@ public interface MathHelper {
             Pair<Double,Double> pair = mapper.apply(dataPoint);
             double error = pair.getOne() - pair.getOther();
             sumOfSquaredErrors += weights.get(idx)*Math.pow(error, 2);
+            idx+=1;
         }
 
         double mse = sumOfSquaredErrors / weights.stream().reduce((a,b)->a+b).get();
