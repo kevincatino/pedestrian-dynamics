@@ -3,7 +3,7 @@ import os
 from matplotlib import pyplot as plt
 
 prefix = '../../'
-file = 'compVelocity-10-9.80-11.90.json'
+file = 'compVelocity-21-23.60-25.00.json'
 
 fig, ax = plt.subplots()
 
@@ -25,7 +25,7 @@ for v in json_input['velocities']:
 
 ax.plot(time, vExp,   label=f'vExp - id={str(json_input["id"])}', marker='o')
 ax.plot(time, vSim,   label=f'vSim - id={str(json_input["id"])}')
-ax.axhline(y=1.91, color='red', linestyle='--', label=r'$v^{max}_d$')
+ax.axhline(y=1.62, color='red', linestyle='--', label=r'$v^{max}_d$')
 
 ax.set_xlabel(r'Tiempo $[s]$')
 ax.set_ylabel(r'Velocidad $[\frac{m}{s}]$')

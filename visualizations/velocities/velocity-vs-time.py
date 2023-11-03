@@ -3,7 +3,7 @@ import math
 from matplotlib import pyplot as plt
 
 prefix = '../../'
-file = 'expVelocity2.json'
+file = 'expVelocity10.json'
 
 fig, ax = plt.subplots()
 
@@ -13,16 +13,18 @@ json_input = json.load(f)
 time = []
 vel = []
 
-vd_min = 0.21
-vd_max = 1.65
+vd_min = 0
+vd_max = 1.91
 
-ts = [4.8, 6, 6.4, 9.3,
-						19.9, 21.6, 22, 24.6]
+ts = [8.20, 9.8, 9.9, 11.7,
+      						19.8, 21.2, 21.2, 23.7,
+      						25.5, 27.5, 27.5, 29.5]
+
 
 
 
 colors = ["red", "blue", "green", "brown", "orange", "purple", "cyan", "brown", "gray", "blue"]
-vertical_lines = True
+vertical_lines = False
 horizontal_line = True
 
 for v in json_input['velocities']:
@@ -47,7 +49,7 @@ ax.set_xlabel(r'Tiempo $[s]$')
 ax.set_ylabel(r'Velocidad $[\frac{m}{s}]$')
 ax.grid(False)
 ax.legend(loc='center left', bbox_to_anchor=(0.8, 0.4))
-ax.set_title(f'id={str(json_input["id"])}')
+#ax.set_title(f'id={str(json_input["id"])}')
 
 
 if vertical_lines:
